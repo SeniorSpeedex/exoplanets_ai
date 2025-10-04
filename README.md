@@ -183,3 +183,15 @@ Point your domain to server IP with A records:
 | "Leverage modern AI/ML frameworks"                            | **CatBoost Classifier** + **Scikit-learn KNN** + **Full Python data science stack** (`requirements.txt`)         |
 
 ---
+
+### **They worked for you:**
+
+**Timur Veliev - teamlead, github.com/SeniorSpeedex**
+
+**Dmitriy Susin - backend developer, github.com/F1ling**
+
+**Mikhail Novoselov - ML Engineer, telegram: @Redgrave23** 
+
+**Artem Emelyanov - Data Analyst, github.com/pnby**
+
+---
