@@ -117,7 +117,7 @@ docker-compose up --build
 
 | **Requirements**                                              | **ExoAI Implementation**                                                                                         |
 |---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| "Develop AI/ML solutions for exoplanet detection and analysis" | **Production CatBoost model** (`catboost_model.cbm`) + `knn_input.sav` = high accuracy   |
+| "Develop AI/ML solutions for exoplanet detection and analysis" | **Production CatBoost model** (`catboost_model.cbm`) + `knn_imput.sav` = high accuracy   |
 | "Process and analyze Kepler mission data"                     | **Complete data pipeline** in `model.ipynb` processing `cumulative_2025.09.20_00:18:02.csv` dataset              |
 | "Create accessible tools and interfaces"                      | **FastAPI backend** (`main.py`) + **Interactive web interface** (`static/index.html`) + **RESTful API endpoints** |
 | "Ensure reproducibility and scalability"                      | **Docker containerization** (`Dockerfile`, `docker-compose.yml`) + **MongoDB integration** (`init-mongo.js`)     |
