@@ -1,3 +1,4 @@
+# .dockerignore
 .git
 .gitignore
 .env
@@ -20,4 +21,3 @@ yarn-error.log*
 .coverage
 .pytest_cache/
 .mypy_cache/
-docker-setup.py

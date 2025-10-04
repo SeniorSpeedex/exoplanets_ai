@@ -1,0 +1,43 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: exoplanet_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: exoplanet_ai
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - exoplanet_network
+
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: exoplanet_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://admin:password123@mongodb:27017/exoplanet_ai?authSource=admin
+      - DATABASE_NAME=exoplanet_ai
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-Sigmaboy123}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./static:/app/static
+      - .:/app
+    networks:
+      - exoplanet_network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  mongodb_data:
+
+networks:
+  exoplanet_network:
+    driver: bridge

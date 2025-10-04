@@ -1,8 +1,8 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 import numpy as np
 import smtplib
@@ -20,16 +20,15 @@ from catboost import CatBoostClassifier
 import pickle
 from sklearn.impute import KNNImputer
 import pandas as pd
-from predict import ModelNasa
+#from predict import ModelNasa  
 import secrets
 from typing import Optional
-
-app = FastAPI(version="1.0", title="NASA Exoplanet Habitability Analysis API")
+from predict import ModelNasa
+app = FastAPI(version="1.0", title="NASA Exoplanet Analysis API")
 
 # Конфигурация email для ОС
 EMAIL_CONFIG = {
     "address": "minobra52@gmail.com",
-    
     "smtp_server": "smtp.gmail.com",
     "smtp_port": 587,
     "password": os.getenv("EMAIL_PASSWORD") or "Sigmaboy123"  # Используем пароль приложения
@@ -45,18 +44,16 @@ app_settings = {
     "theme": "dark"
 }
 
-
 origins = [
     "http://localhost",  # Для доступа по локальному хосту
     "http://localhost:8080",  
     "http://127.0.0.1:5500",  
     "http://127.0.0.1:8000", 
-    
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Используем список вместо ["*"]
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -73,24 +70,20 @@ educational_content = {}
 user_accounts = {}  # email -> user_data
 active_sessions = {}  # session_token -> user_id
 
-
 # Модели данных Pydantic (расширенные)
 class UserSettings(BaseModel):
     language: str = "ru"
     theme: str = "dark"
-    user_id: str = None
-
+    user_id: Optional[str] = None  # Исправлено: | на Optional
 
 class UserRegistration(BaseModel):
     username: str
     email: str
     password: str
 
-
 class UserLogin(BaseModel):
     email: str
     password: str
-
 
 class UserProfile(BaseModel):
     user_id: str
@@ -98,7 +91,6 @@ class UserProfile(BaseModel):
     email: str
     registration_date: str
     searches_count: int
-
 
 class ExoplanetData(BaseModel):
     # Основные параметры (расширенный список согласно фронту)
@@ -125,13 +117,11 @@ class ExoplanetData(BaseModel):
     stellar_radius: float = 1.0
     age_of_system: float = 5.0  # в миллиардах лет
 
-
 class FeedbackRequest(BaseModel):
     name: str
     email: str
     message: str
-    user_id: str = None
-
+    user_id: Optional[str] = None  # Исправлено: None на Optional[str]
 
 class SearchResponse(BaseModel):
     habitable: bool
@@ -139,7 +129,6 @@ class SearchResponse(BaseModel):
     analysis: str
     details: dict
     search_id: str
-
 
 class PDFRequest(BaseModel):
     search_id: str
@@ -151,10 +140,8 @@ def hash_password(password: str) -> str:
     import hashlib
     return hashlib.sha256(password.encode()).hexdigest()
 
-
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return hash_password(plain_password) == hashed_password
-
 
 def create_session(user_id: str) -> str:
     session_token = secrets.token_urlsafe(32)
@@ -163,7 +150,6 @@ def create_session(user_id: str) -> str:
         "created_at": datetime.now().isoformat()
     }
     return session_token
-
 
 # Загрузка образовательного контента при старте
 def load_educational_content():
@@ -225,8 +211,6 @@ def load_educational_content():
         }
     }
 
-
-
 class MockExoplanetModel(ModelNasa):
     def __init__(self):
         super().__init__('catboost_model.cbm', 'knn_imput.sav')
@@ -252,22 +236,27 @@ class MockExoplanetModel(ModelNasa):
             'ra': (279.85272, 301.72076),
             'dec': (36.577381, 52.33601),
             'kepler_band': (6.966, 20.003)
-
         }
-
+    def analys(self,data: ExoplanetData):
+        x = pd.DataFrame(columns=self.columns)
+        x.loc[0] = [np.nan] * 16
+        for i in self.names:
+            x.loc[0, self.comp[i]] = getattr(data, i)
+        return self.analys_feat(x)
+        
     def predict_habitability(self, data: ExoplanetData):
         x = pd.DataFrame(columns=self.columns)
         x.loc[0] = [np.nan] * 16
         for i in self.names:
             x.loc[0, self.comp[i]] = getattr(data, i)
 
-        confidence = model.prediction(x)
+        confidence = self.prediction(x)  # Исправлено: model.prediction на self.prediction
         if confidence > 0.5:
             habitable = 1
         else:
             habitable = 0
 
-        return habitable, confidence * 100
+        return bool(habitable), confidence * 100  # Исправлено: возвращаем bool
 
     def _evaluate_temperature(self, temp: float):
         optimal_range = self.hyperparameters["temperature_range"]
@@ -320,9 +309,8 @@ class MockExoplanetModel(ModelNasa):
 
         return sum(factors) / len(factors) if factors else 0.5
 
-
+# Инициализация модели
 model = MockExoplanetModel()
-
 
 # УЛУЧШЕННАЯ функция отправки email с обработкой ошибок
 async def send_feedback_email(feedback: FeedbackRequest):
@@ -330,18 +318,18 @@ async def send_feedback_email(feedback: FeedbackRequest):
     try:
         # Проверяем конфигурацию email
         if not all([EMAIL_CONFIG["address"], EMAIL_CONFIG["password"]]):
-            print("❌ Email configuration incomplete. Skipping email send.")
+            print("Email configuration incomplete. Skipping email send.")
             return False
 
         if EMAIL_CONFIG["password"] == "your_app_specific_password_here":
-            print("❌ Default email password detected. Please set EMAIL_PASSWORD environment variable.")
+            print("Default email password detected. Please set EMAIL_PASSWORD environment variable.")
             return False
 
         # Создаем сообщение
         msg = MIMEMultipart()
         msg['From'] = EMAIL_CONFIG["address"]
         msg['To'] = EMAIL_CONFIG["address"]
-        msg['Subject'] = f"🚀 Exoplanet AI Feedback from {feedback.name}"
+        msg['Subject'] = f"Exoplanet AI Feedback from {feedback.name}"
 
         body = f"""
         New feedback received from Exoplanet AI:
@@ -388,7 +376,6 @@ async def send_feedback_email(feedback: FeedbackRequest):
         print(f"❌ Unexpected error sending email: {str(e)}")
         return False
 
-
 # Функция генерации PDF
 def generate_pdf_report(search_data: dict, language: str = "ru"):
     try:
@@ -412,28 +399,31 @@ def generate_pdf_report(search_data: dict, language: str = "ru"):
         content.append(Paragraph(title_text, title_style))
 
         # Информация о системе
+        params = search_data['parameters']
+        feat = search_data['shap']
+        
         system_info = [
-            ["Parameter", "Value"],
-            ["Star System", search_data['parameters']['star_system']],
-            ["Planetary Radius", f"{search_data['parameters']['planetary_radius']} R⊕"],
-            ["Equilibrium Temperature", f"{search_data['parameters']['equilibrium_temperature']} K"],
-            ["Orbital Period", f"{search_data['parameters']['orbital_period']} days"],
-            ["Transit Epoch", f"{search_data['parameters']['transit_epoch']}"],
-            ["Impact Parameter", f"{search_data['parameters']['impact_parameter']}"],
-            ["Transit Duration", f"{search_data['parameters']['transit_duration']} hours"],
-            ["Transit Depth", f"{search_data['parameters']['transit_depth']} ppm"],
-            ["Insolation Flux", f"{search_data['parameters']['insolation_flux']} F⊕"],
-            ["Transit SNR", f"{search_data['parameters']['transit_snr']}"],
-            ["TCE Planet Number", f"{search_data['parameters']['tce_planet_number']}"],
-            ["Stellar Temperature", f"{search_data['parameters']['stellar_temperature']} K"],
-            ["Stellar Surface Gravity", f"{search_data['parameters']['stellar_surface_gravity']} log(cm/s²)"],
-            ["Right Ascension", f"{search_data['parameters']['ra']}°"],
-            ["Declination", f"{search_data['parameters']['dec']}°"],
-            ["Kepler Band Magnitude", f"{search_data['parameters']['kepler_band']}"],
-            ["Stellar Radius", f"{search_data['parameters']['stellar_radius']} R☉"],
-            ["Stellar Mass", f"{search_data['parameters']['stellar_mass']} M☉"],
-            ["Stellar Metallicity", f"{search_data['parameters']['stellar_metallicity']}"],
-            ["System Age", f"{search_data['parameters']['age_of_system']} billion years"]
+            ["Parameter", "Value","Features importance"],
+            ["Star System", params.get('star_system', 'N/A'),' '],
+            ["Planetary Radius", f"{params.get('planetary_radius', 'N/A')} R⊕",feat.loc[0,'planetary_radius']],
+            ["Equilibrium Temperature", f"{params.get('equilibrium_temperature', 'N/A')} K",feat.loc[0,'equilibrium_temperature']],
+            ["Orbital Period", f"{params.get('orbital_period', 'N/A')} days",feat.loc[0,'orbital_period']],
+            ["Transit Epoch", f"{params.get('transit_epoch', 'N/A')}",feat.loc[0,'transit_epoch']],
+            ["Impact Parameter", f"{params.get('impact_parameter', 'N/A')}",feat.loc[0,'impact_parameter']],
+            ["Transit Duration", f"{params.get('transit_duration', 'N/A')} hours",feat.loc[0,'transit_duration']],
+            ["Transit Depth", f"{params.get('transit_depth', 'N/A')} ppm",feat.loc[0,'transit_depth']],
+            ["Insolation Flux", f"{params.get('insolation_flux', 'N/A')} F⊕",feat.loc[0,'insolation_flux']],
+            ["Transit SNR", f"{params.get('transit_snr', 'N/A')}",feat.loc[0,'transit_snr']],
+            ["TCE Planet Number", f"{params.get('tce_planet_number', 'N/A')}",feat.loc[0,'tce_planet_number']],
+            ["Stellar Temperature", f"{params.get('stellar_temperature', 'N/A')} K",feat.loc[0,'stellar_temperature']],
+            ["Stellar Surface Gravity", f"{params.get('stellar_surface_gravity', 'N/A')} log(cm/s²)",feat.loc[0,'stellar_surface_gravity']],
+            ["Right Ascension", f"{params.get('ra', 'N/A')}°",feat.loc[0,'ra']],
+            ["Declination", f"{params.get('dec', 'N/A')}°",feat.loc[0,'dec']],
+            ["Kepler Band Magnitude", f"{params.get('kepler_band', 'N/A')}",feat.loc[0,'kepler_band']],
+            ["Stellar Radius", f"{params.get('stellar_radius', 'N/A')} R☉",feat.loc[0,'stellar_radius']],
+            ["Stellar Mass", f"{params.get('stellar_mass', 'N/A')} M☉"," "],
+            ["Stellar Metallicity", f"{params.get('stellar_metallicity', 'N/A')}"," "],
+            ["System Age", f"{params.get('age_of_system', 'N/A')} billion years"," "]
         ]
 
         system_table = Table(system_info)
@@ -454,14 +444,15 @@ def generate_pdf_report(search_data: dict, language: str = "ru"):
         result_text = "Analysis Results" if language == "en" else "Результаты анализа"
         content.append(Paragraph(result_text, styles['Heading2']))
 
-        habitable_text = "Successful" if search_data['result']['habitable'] else "Not an exoplanet"
-        habitable_text_ru = "Является экзопланетой" if search_data['result']['habitable'] else "Не является экзопланетой"
+        result_data = search_data['result']
+        habitable_text = "Successful" if result_data['habitable'] else "Not an exoplanet"
+        habitable_text_ru = "Является экзопланетой" if result_data['habitable'] else "Не является экзопланетой"
 
         result_info = [
             ["Metric", "Value"],
             ["Analysis status", habitable_text if language == "en" else habitable_text_ru],
-            ["Confidence Level", f"{search_data['result']['confidence']:.1f}%"],
-            ["Analysis", search_data['result']['analysis']]
+            ["Confidence Level", f"{result_data.get('confidence', 0):.1f}%"],
+            ["Analysis", result_data.get('analysis', 'N/A')]
         ]
 
         result_table = Table(result_info)
@@ -478,19 +469,16 @@ def generate_pdf_report(search_data: dict, language: str = "ru"):
         print(f"Error generating PDF: {str(e)}")
         return None
 
-
 # Инициализация при запуске
 @app.on_event("startup")
 async def startup_event():
     load_educational_content()
     print("NASA Exoplanet AI Backend started successfully")
 
-
 # Serve main page
 @app.get("/")
 async def read_index():
     return FileResponse('static/index.html')
-
 
 # Эндпоинт для регистрации пользователя
 @app.post("/api/register")
@@ -520,7 +508,6 @@ async def register_user(user_data: UserRegistration):
         "username": user_data.username
     }
 
-
 # Эндпоинт для авторизации пользователя
 @app.post("/api/login")
 async def login_user(login_data: UserLogin):
@@ -542,7 +529,6 @@ async def login_user(login_data: UserLogin):
         "username": user_data["username"]
     }
 
-
 # Эндпоинт для выхода
 @app.post("/api/logout")
 async def logout_user(session_token: str):
@@ -550,7 +536,6 @@ async def logout_user(session_token: str):
         del active_sessions[session_token]
 
     return {"status": "success", "message": "Logout successful"}
-
 
 # Эндпоинт для получения ID пользователя
 @app.get("/api/user/id")
@@ -564,7 +549,6 @@ async def get_user_id():
     }
     return {"user_id": user_id}
 
-
 # Эндпоинт для сохранения настроек
 @app.post("/settings")
 async def save_user_settings(settings: UserSettings):
@@ -577,7 +561,6 @@ async def save_user_settings(settings: UserSettings):
 
     return {"status": "success", "message": "Settings saved successfully"}
 
-
 # Эндпоинт для получения образовательного контента
 @app.get("/api/education/{topic}")
 async def get_educational_content(topic: str, language: str = "ru"):
@@ -589,11 +572,18 @@ async def get_educational_content(topic: str, language: str = "ru"):
     else:
         raise HTTPException(status_code=404, detail="Educational topic not found")
 
-
 # Эндпоинт анализа экзопланеты (обновленный)
 @app.post("/search", response_model=SearchResponse)
-async def analyze_exoplanet(data: ExoplanetData, session_token: Optional[str] = None):
+async def analyze_exoplanet(
+    data: ExoplanetData, 
+    session_token: Optional[str] = None,
+    authorization: Optional[str] = Header(None)  # Добавлена поддержка заголовка Authorization
+):
     """Расширенный анализ экзопланеты на обитаемость с гиперпараметрами"""
+
+    # Получаем session_token из заголовка Authorization, если не передан в теле
+    if not session_token and authorization and authorization.startswith("Bearer "):
+        session_token = authorization.replace("Bearer ", "")
 
     user_id = None
     if session_token and session_token in active_sessions:
@@ -604,15 +594,18 @@ async def analyze_exoplanet(data: ExoplanetData, session_token: Optional[str] = 
                 account["searches_count"] += 1
                 break
 
+    # Определяем язык для анализа
+    language = "ru"
+    if user_id and user_id in user_sessions:
+        user_settings = user_sessions[user_id].get("settings", {})
+        language = user_settings.get("language", "ru")
+    shap_values = model.analys(data)
     # Анализ с использованием модели и гиперпараметров
     habitable, confidence = model.predict_habitability(data)
 
     # Генерация анализа на основе результатов
-    if language := (user_sessions.get(user_id, {}).get("settings", {}).get("language", "ru")):
-        if language == "en":
-            analysis = generate_english_analysis(habitable, confidence, data)
-        else:
-            analysis = generate_russian_analysis(habitable, confidence, data)
+    if language == "en":
+        analysis = generate_english_analysis(habitable, confidence, data)
     else:
         analysis = generate_russian_analysis(habitable, confidence, data)
 
@@ -627,7 +620,8 @@ async def analyze_exoplanet(data: ExoplanetData, session_token: Optional[str] = 
             "habitable": habitable,
             "confidence": confidence,
             "analysis": analysis
-        }
+        },
+        "shap":shap_values
     }
     exoplanet_history.append(search_record)
 
@@ -639,8 +633,7 @@ async def analyze_exoplanet(data: ExoplanetData, session_token: Optional[str] = 
         search_id=search_id
     )
 
-
-# Эндпоинт для генерации PDF отчета(не работает)
+# Эндпоинт для генерации PDF отчета
 @app.post("/api/generate-pdf")
 async def generate_pdf(request: PDFRequest):
     # Поиск данных анализа по ID
@@ -657,14 +650,17 @@ async def generate_pdf(request: PDFRequest):
     pdf_filename = generate_pdf_report(search_data, request.language)
 
     if pdf_filename and os.path.exists(pdf_filename):
-        return FileResponse(pdf_filename, filename=f"exoplanet_report_{request.search_id}.pdf")
+        return FileResponse(
+            pdf_filename, 
+            filename=f"exoplanet_report_{request.search_id}.pdf",
+            media_type='application/pdf'
+        )
     else:
         raise HTTPException(status_code=500, detail="Error generating PDF report")
 
-
 # Эндпоинт истории поисков (обновленный)
 @app.get("/history")
-async def get_search_history(user_id: str = None):
+async def get_search_history(user_id: Optional[str] = None):  # Исправлено: None на Optional[str]
     """Получение истории поисков с фильтрацией по пользователю"""
     if user_id:
         user_searches = [s for s in exoplanet_history if s.get("user_id") == user_id]
@@ -677,10 +673,12 @@ async def get_search_history(user_id: str = None):
         "searches": searches
     }
 
-
 # Эндпоинт профиля пользователя (обновленный)
 @app.get("/me")
-async def get_user_profile(session_token: Optional[str] = None, authorization: Optional[str] = None):
+async def get_user_profile(
+    session_token: Optional[str] = None, 
+    authorization: Optional[str] = Header(None)
+):
     """Получение профиля пользователя с статистикой"""
     user_data = None
 
@@ -744,7 +742,6 @@ async def submit_feedback(feedback: FeedbackRequest, background_tasks: Backgroun
         "received_data": feedback.dict()
     }
 
-
 # Эндпоинт статистики обратной связи
 @app.get("/feedback/stats")
 async def get_feedback_stats():
@@ -753,29 +750,23 @@ async def get_feedback_stats():
         "latest_feedback": feedback_data[-5:] if feedback_data else []
     }
 
-
 # Вспомогательные функции для генерации текста анализа
 def generate_russian_analysis(habitable: bool, confidence: float, data: ExoplanetData) -> str:
     if habitable:
-        return f"Planet in {data.star_system} system is an exoplanet!. " \
-               f"Analysis confidence: {confidence:.1f}%. Further study recommended."
+        return f"Планета в системе {data.star_system} является экзопланетой! " \
+               f"Уверенность анализа: {confidence:.1f}%. Рекомендуется дальнейшее изучение."
     else:
-        return f"Planet in {data.star_system} system is not an exoplanet! " \
-               f"Analysis confidence: {confidence:.1f}%. "
-
+        return f"Планета в системе {data.star_system} не является экзопланетой! " \
+               f"Уверенность анализа: {confidence:.1f}%."
 
 def generate_english_analysis(habitable: bool, confidence: float, data: ExoplanetData) -> str:
     if habitable:
-        return f"Planet in {data.star_system} system is an exoplanet!. " \
+        return f"Planet in {data.star_system} system is an exoplanet! " \
                f"Analysis confidence: {confidence:.1f}%. Further study recommended."
     else:
         return f"Planet in {data.star_system} system is not an exoplanet! " \
-               f"Analysis confidence: {confidence:.1f}%. "
-
+               f"Analysis confidence: {confidence:.1f}%."
 
 if __name__ == "__main__":
     import uvicorn
-
-
-    uvicorn.run("main:app", reload=True)
-
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

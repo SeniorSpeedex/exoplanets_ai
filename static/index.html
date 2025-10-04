@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXOPLANETS AI - NASA</title>
+    <title>EXOPLANETS AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -1126,9 +1126,9 @@
             <div class="form-group">
                 <label class="form-label" for="themeSelect"><span id="themeLabel">Тема оформления</span></label>
                 <select id="themeSelect" class="form-select">
-                    <option value="dark">Тёмная (по умолчанию)</option>
-                    <option value="light">Светлая</option>
-                    <option value="blue">Синяя</option>
+                    <option value="dark">Dark (Main theme)</option>
+                    <option value="light">Light</option>
+                    <option value="blue">Blue</option>
                 </select>
             </div>
             <div class="form-buttons">
@@ -1143,7 +1143,7 @@
         <div class="auth-form">
             <h2 class="form-title">
                 <i class="fas fa-user-astronaut"></i>
-                <span id="authTitle">NASA ID</span>
+                <span id="authTitle">USER ID</span>
             </h2>
             <div class="auth-tabs">
                 <button class="auth-tab active" data-tab="login"><span id="loginTabText">Вход</span></button>
@@ -1190,7 +1190,7 @@
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="nasa-logo">NASA</div>
+            <div class="nasa-logo">EXO</div>
             <div class="app-name">EXOPLANETS AI</div>
         </div>
 
@@ -1247,7 +1247,7 @@
             <h1 class="page-title" id="pageTitle">Анализ экзопланет на обитаемость</h1>
             <button class="login-btn">
                 <i class="fas fa-sign-in-alt"></i>
-                <span id="loginBtnText">NASA ID</span>
+                <span id="loginBtnText">USER ID</span>
             </button>
         </div>
 
@@ -1355,7 +1355,7 @@
                 historyTitle: "ИСТОРИЯ ЗАПРОСОВ",
                 settingsBtn: "Настройки",
                 feedbackBtn: "Обратная связь",
-                loginBtn: "NASA ID",
+                loginBtn: "USER ID",
                 settingsTitle: "Настройки",
                 languageLabel: "Язык интерфейса",
                 themeLabel: "Тема оформления",
@@ -1377,7 +1377,7 @@
                 userStatus: "Online",
                 orbitalPeriodLabel: "ОРБИТАЛЬНЫЙ ПЕРИОД",
                 transitEpochLabel: "ЭПОХА ТРАНЗИТА",
-                impactParameterLabel: "ПАРАМЕТр УДАРА",
+                impactParameterLabel: "ПАРАМЕТР УДАРА",
                 transitDurationLabel: "ПРОДОЛЖИТЕЛЬНОСТЬ ТРАНЗИТА",
                 transitDepthLabel: "ГЛУБИНА ТРАНЗИТА",
                 planetaryRadiusLabel: "РАДИУС ПЛАНЕТЫ",
@@ -1409,7 +1409,7 @@
                 decHint: "В градусах",
                 keplerBandHint: "В системе Kepler-band",
                 starSystemHint: "Название системы",
-                authTitle: "NASA ID",
+                authTitle: "USER ID",
                 loginTabText: "Вход",
                 registerTabText: "Регистрация",
                 loginEmailLabel: "Email",
@@ -1434,7 +1434,7 @@
                 historyTitle: "SEARCH HISTORY",
                 settingsBtn: "Settings",
                 feedbackBtn: "Feedback",
-                loginBtn: "NASA ID",
+                loginBtn: "USER ID",
                 settingsTitle: "Settings",
                 languageLabel: "Interface Language",
                 themeLabel: "Theme",
@@ -1488,7 +1488,7 @@
                 decHint: "In degrees",
                 keplerBandHint: "In Kepler-band system",
                 starSystemHint: "System name",
-                authTitle: "NASA ID",
+                authTitle: "USER ID",
                 loginTabText: "Login",
                 registerTabText: "Register",
                 loginEmailLabel: "Email",
@@ -1701,7 +1701,6 @@
 
         function hideAuthModal() {
             document.getElementById('authModal').classList.remove('active');
-            // Очистка полей
             document.getElementById('loginEmail').value = '';
             document.getElementById('loginPassword').value = '';
             document.getElementById('registerUsername').value = '';
@@ -2003,7 +2002,6 @@
                 // Сохраняем search_id для генерации PDF
                 window.currentSearchId = result.search_id;
 
-                // Настраиваем кнопку генерации PDF
                 setupPdfButton();
 
                 await loadHistory();
@@ -2125,4 +2123,7 @@
         }
     </script>
 </body>
+
 </html>
+
+
