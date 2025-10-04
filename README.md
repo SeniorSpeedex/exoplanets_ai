@@ -93,7 +93,60 @@ docker-compose up --build
 *3. After completing all steps, the application will be available at - http://127.0.0.1:8000*
 
 - **Cloud:**  
-  -
+  ## Server Setup with Docker
+
+### Prerequisites
+- Linux VPS with Docker and Docker Compose
+- Root SSH access
+
+
+1. **Connect to server:**
+   ```bash
+   ssh root@your-server-ip
+   ```
+
+2. **Create project directory:**
+   ```bash
+   mkdir -p /home/speedsense
+   cd /home/speedsense
+   ```
+
+3. **Upload all project files to `/home/speedsense/`**
+
+4. **Deploy:**
+   ```bash
+   docker-compose up -d
+   ```
+
+5. **Verify:**
+   ```bash
+   docker ps
+   docker logs exoplanet_app
+   ```
+
+### Access Application
+- Web interface: `http://your-server-ip:8000`
+
+### Management Commands
+```bash
+# Stop application
+docker-compose down
+
+# Restart
+docker-compose restart
+
+# Update with changes
+docker-compose up -d --build
+
+# View logs
+docker logs exoplanet_app -f
+```
+
+### Domain Setup
+Point your domain to server IP with A records:
+- `@` → `your-server-ip`
+- `www` → `your-server-ip`
+```
 
 ---
 
