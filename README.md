@@ -17,8 +17,8 @@
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/SeniorSpeedex/exoai.git
-   cd exoai
+   git clone https://github.com/SeniorSpeedex/exoplanets_ai.git
+   cd exoplanets_ai
    ```
 
 2. **Install dependencies:**
