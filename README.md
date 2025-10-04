@@ -146,9 +146,8 @@ docker logs exoplanet_app -f
 Point your domain to server IP with A records:
 - `@` → `your-server-ip`
 - `www` → `your-server-ip`
-```
 
----
+
 
 ## Features
 
