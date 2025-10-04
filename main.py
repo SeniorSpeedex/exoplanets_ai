@@ -753,11 +753,11 @@ async def get_feedback_stats():
 # Вспомогательные функции для генерации текста анализа
 def generate_russian_analysis(habitable: bool, confidence: float, data: ExoplanetData) -> str:
     if habitable:
-        return f"Планета в системе {data.star_system} является экзопланетой! " \
-               f"Уверенность анализа: {confidence:.1f}%. Рекомендуется дальнейшее изучение."
+        return f"Planet in {data.star_system} system is an exoplanet! " \
+               f"Analysis confidence: {confidence:.1f}%. Further study recommended."
     else:
-        return f"Планета в системе {data.star_system} не является экзопланетой! " \
-               f"Уверенность анализа: {confidence:.1f}%."
+        return f"Planet in {data.star_system} system is not an exoplanet! " \
+               f"Analysis confidence: {confidence:.1f}%."
 
 def generate_english_analysis(habitable: bool, confidence: float, data: ExoplanetData) -> str:
     if habitable:
@@ -769,4 +769,5 @@ def generate_english_analysis(habitable: bool, confidence: float, data: Exoplane
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
