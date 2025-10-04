@@ -111,3 +111,16 @@ docker-compose up --build
   Share and explore results easily in any browser.
 - **Easy Local & Cloud Deployment:**  
   Minimal setup for running locally or in cloud environments.
+
+
+## 🎯 Challenge requirements
+
+| **Requirements**                                              | **ExoAI Implementation**                                                                                         |
+|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| "Develop AI/ML solutions for exoplanet detection and analysis" | **Production CatBoost model** (`catboost_model.cbm`) + **KNN classifier** (`knn_input.sav`) with high accuracy   |
+| "Process and analyze Kepler mission data"                     | **Complete data pipeline** in `model.ipynb` processing `cumulative_2025.09.20_00:18:02.csv` dataset              |
+| "Create accessible tools and interfaces"                      | **FastAPI backend** (`main.py`) + **Interactive web interface** (`static/index.html`) + **RESTful API endpoints** |
+| "Ensure reproducibility and scalability"                      | **Docker containerization** (`Dockerfile`, `docker-compose.yml`) + **MongoDB integration** (`init-mongo.js`)     |
+| "Provide data visualization capabilities"                     | **Jupyter notebooks** (`model.ipynb`) + **HTML visualizations** + **Real-time prediction interface**             |
+| "Implement end-to-end exoplanet hunting workflow"             | **From raw data → feature engineering → model training → prediction serving** in unified platform                |
+| "Leverage modern AI/ML frameworks"                            | **CatBoost Classifier** + **Scikit-learn KNN** + **Full Python data science stack** (`requirements.txt`)         |
