@@ -179,4 +179,4 @@ Point your domain to server IP with A records:
 
 
 ## Link to the demo!
-http://84.54.29.144:8000/
+http://84.54.29.144:8000/ -- all functions are working there! Try and send your feedback to us!
