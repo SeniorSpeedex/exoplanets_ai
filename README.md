@@ -1,6 +1,6 @@
 # ExoAI
 
-**ExoAI** is an open-source platform designed to tackle the NASA Space Apps Challenge 2025 task: "A World Away: Hunting for Exoplanets with AI". The project combines interactive Jupyter Notebooks, Python scripts, HTML visualizations, and a FastAPI-powered backend to solve the challenge's core problems using modern AI and data science tools.
+**ExoAI** harnesses the power of artificial intelligence to improve the search for exoplanets. Developed for NASA's Space Apps Challenge in 2025, our open-source platform transforms complex astronomical data into actionable insights. Combining exploratory Jupyter Notebook, a scalable FastAPI backend and interactive visualizations, ExoAI provides a powerful and accessible toolkit for identifying and verifying planetary candidates outside our solar system.
 
 ---
 
