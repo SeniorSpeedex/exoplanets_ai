@@ -176,3 +176,7 @@ Point your domain to server IP with A records:
 | "Provide data visualization capabilities"                     | **Jupyter notebooks** (`model.ipynb`) + **HTML visualizations** + **Real-time prediction interface**             |
 | "Implement end-to-end exoplanet hunting workflow"             | **From raw data → feature engineering → model training → prediction serving** in unified platform                |
 | "Leverage modern AI/ML frameworks"                            | **CatBoost Classifier** + **Scikit-learn KNN** + **Full Python data science stack** (`requirements.txt`)         |
+
+
+## Link to the demo!
+http://84.54.29.144:8000/
