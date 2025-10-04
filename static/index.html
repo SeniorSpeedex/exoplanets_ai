@@ -1126,9 +1126,9 @@
             <div class="form-group">
                 <label class="form-label" for="themeSelect"><span id="themeLabel">Тема оформления</span></label>
                 <select id="themeSelect" class="form-select">
-                    <option value="dark">Тёмная (по умолчанию)</option>
-                    <option value="light">Светлая</option>
-                    <option value="blue">Синяя</option>
+                    <option value="dark">Dark (Main theme)</option>
+                    <option value="light">Light</option>
+                    <option value="blue">Blue</option>
                 </select>
             </div>
             <div class="form-buttons">
@@ -1143,7 +1143,7 @@
         <div class="auth-form">
             <h2 class="form-title">
                 <i class="fas fa-user-astronaut"></i>
-                <span id="authTitle">NASA ID</span>
+                <span id="authTitle">USER ID</span>
             </h2>
             <div class="auth-tabs">
                 <button class="auth-tab active" data-tab="login"><span id="loginTabText">Вход</span></button>
@@ -1701,7 +1701,6 @@
 
         function hideAuthModal() {
             document.getElementById('authModal').classList.remove('active');
-            // Очистка полей
             document.getElementById('loginEmail').value = '';
             document.getElementById('loginPassword').value = '';
             document.getElementById('registerUsername').value = '';
@@ -2003,7 +2002,6 @@
                 // Сохраняем search_id для генерации PDF
                 window.currentSearchId = result.search_id;
 
-                // Настраиваем кнопку генерации PDF
                 setupPdfButton();
 
                 await loadHistory();
@@ -2127,3 +2125,4 @@
 </body>
 
 </html>
+
