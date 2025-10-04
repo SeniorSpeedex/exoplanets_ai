@@ -48,15 +48,16 @@
 ## Deployment
 
 - ## **Local:**  
-### **Для запуска проекта выполните следующие шаги:**
+### **To run the project locally, follow these steps:**
 
-## 1. Настройка виртуального окружения
+## **1. Virtual Environment Setup**
 
-### Создайте виртуальное окружение:
+*Create a virtual environment:*
 ```bash
 python -m venv venv
 ```
-Активируйте виртуальное окружение:
+**Activate the virtual environment:**
+
 *Windows:*
 ```bash
 venv\Scripts\activate
@@ -65,29 +66,32 @@ venv\Scripts\activate
 ```bash
 source venv/bin/activate
 ```
-## 2. Установка зависимостей
-*Установите необходимые пакеты из файла requirements.txt:*
+## **2. Install Dependencies**
+*Install required packages from requirements.txt:*
 ```bash
 pip install -r requirements.txt
 ```
-## 3. Проверка конфигурации и инициализация
-*Запустите скрипт подготовки Docker:*
+## **3. Configuration Check and Initialization**
+
+*Run the Docker setup script:*
 ```bash
 python docker-setup.py
 ```
-## 4. Запуск Docker-контейнеров
-*Соберите и запустите сервисы через Docker Compose:*
+## **4. Run Docker Containers**
+
+*Build and start services using Docker Compose:*
 ```bash
 docker-compose up --build
 ```
-## P.S
-*1. Убедитесь, что Docker и Docker Compose установлены в вашей системе*
 
-*2. Проверьте, что файлы requirements.txt и docker-setup.py находятся в корне проекта*
+## **P.S**
 
-*3. После выполнения всех шагов приложение будет доступно по адресу - http://127.0.0.1:8000*
+*1. Make sure Docker and Docker Compose are installed on your system*
 
-  -
+*2. Verify that requirements.txt and docker-setup.py files are in the project root*
+
+*3. After completing all steps, the application will be available at - http://127.0.0.1:8000*
+
 - **Cloud:**  
   -
 
