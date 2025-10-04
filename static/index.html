@@ -1,1 +1,2128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXOPLANETS AI - NASA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
 
+        :root {
+            --primary: #1a237e;
+            --primary-light: #534bae;
+            --secondary: #00b0ff;
+            --accent: #76ff03;
+            --dark: #0a0e2a;
+            --darker: #050716;
+            --text: #e3f2fd;
+            --text-secondary: #90a4ae;
+            --sidebar-width: 280px;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+        }
+
+        .light-theme {
+            --primary: #3f51b5;
+            --primary-light: #757de8;
+            --secondary: #2196f3;
+            --accent: #4caf50;
+            --dark: #f5f5f5;
+            --darker: #e0e0e0;
+            --text: #212121;
+            --text-secondary: #757575;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+        }
+
+        .blue-theme {
+            --primary: #0d47a1;
+            --primary-light: #5472d3;
+            --secondary: #0288d1;
+            --accent: #00bcd4;
+            --dark: #01579b;
+            --darker: #002f6c;
+            --text: #e3f2fd;
+            --text-secondary: #90a4ae;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, var(--darker) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Космический фон с анимацией */
+        .space-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 5s) infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.1;
+            animation: drift 60s infinite linear;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(100px, 50px) rotate(360deg); }
+        }
+
+        /* Обновленный сайдбар */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(11, 15, 48, 0.95);
+            border-right: 1px solid var(--secondary);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .light-theme .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .blue-theme .sidebar {
+            background: rgba(13, 71, 161, 0.95);
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(0, 176, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 8s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .nasa-logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--secondary);
+            text-shadow: 0 0 10px rgba(0, 176, 255, 0.5);
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 10px rgba(0, 176, 255, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(0, 176, 255, 0.8), 0 0 30px rgba(0, 176, 255, 0.6); }
+        }
+
+        .app-name {
+            font-size: 1.2rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+
+        .user-section {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--secondary);
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-light), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 176, 255, 0.5);
+            min-width: 40px;
+            min-height: 40px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            animation: orbit 4s linear infinite;
+        }
+
+        @keyframes orbit {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        /* Обновленные навигационные элементы */
+        .nav-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 176, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-item:hover::before {
+            left: 100%;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 176, 255, 0.1);
+            border-left-color: var(--secondary);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 176, 255, 0.15);
+            border-left-color: var(--secondary);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            color: var(--secondary);
+            position: relative;
+        }
+
+        .nav-icon::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            top: -2px;
+            right: -2px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .nav-item.active .nav-icon::after {
+            opacity: 1;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .nav-text {
+            flex: 1;
+        }
+
+        .history-section {
+            padding: 20px;
+            border-top: 1px solid var(--secondary);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Обновленные элементы истории */
+        .history-item {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--secondary);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .history-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .light-theme .history-item {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .light-theme .history-item:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .history-planet-name {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .history-confidence {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .confidence-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .light-theme .confidence-bar {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--secondary);
+        }
+
+        .settings-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 176, 255, 0.2);
+            border: 1px solid var(--secondary);
+            border-radius: 5px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .settings-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .settings-btn:hover::before {
+            left: 100%;
+        }
+
+        .settings-btn:hover {
+            background: rgba(0, 176, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Обновленная основная область контента */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--secondary);
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--text);
+            font-weight: 300;
+            position: relative;
+            display: inline-block;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--secondary), transparent);
+            animation: titleUnderline 3s infinite;
+        }
+
+        @keyframes titleUnderline {
+            0%, 100% { width: 0%; }
+            50% { width: 100%; }
+        }
+
+        /* Обновленные кнопки */
+        .login-btn {
+            padding: 10px 25px;
+            background: linear-gradient(45deg, var(--primary-light), var(--secondary));
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 176, 255, 0.3);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 176, 255, 0.5);
+        }
+
+        .content-body {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Обновленные контейнеры форм */
+        .form-container, .results-container {
+            background: rgba(16, 20, 60, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid var(--secondary);
+            box-shadow: 0 0 30px rgba(0, 176, 255, 0.1);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-container::before, .results-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 176, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .light-theme .form-container, .light-theme .results-container {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 30px rgba(33, 150, 243, 0.1);
+        }
+
+        .blue-theme .form-container, .blue-theme .results-container {
+            background: rgba(13, 71, 161, 0.8);
+            box-shadow: 0 0 30px rgba(2, 136, 209, 0.1);
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .characteristics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .characteristics-table th {
+            text-align: left;
+            padding: 15px 10px;
+            font-weight: normal;
+            color: var(--text);
+            border-bottom: 1px solid var(--secondary);
+            width: 30%;
+        }
+
+        .characteristics-table td {
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--secondary);
+        }
+
+        /* Обновленные поля ввода */
+        .input-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--secondary);
+            border-radius: 5px;
+            padding: 12px 15px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .light-theme .input-field {
+            background: rgba(0, 0, 0, 0.1);
+            color: #212121;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--secondary);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .input-hint {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Обновленные кнопки отправки */
+        .submit-btn {
+            background: linear-gradient(45deg, var(--primary-light), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto 0;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 176, 255, 0.3);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 176, 255, 0.5);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-container {
+            display: none;
+        }
+
+        .light-theme .results-container {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .blue-theme .results-container {
+            background: rgba(13, 71, 161, 0.8);
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .habitability-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .habitable {
+            background: var(--success);
+        }
+
+        .not-habitable {
+            background: var(--error);
+        }
+
+        /* Обновленные результаты */
+        .confidence-display {
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .confidence-value {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .confidence-bar-large {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .light-theme .confidence-bar-large {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .confidence-fill-large {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error), var(--warning), var(--success));
+            border-radius: 10px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confidence-fill-large::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .analysis-text {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        .light-theme .analysis-text {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .light-theme .detail-item {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* Обновленные модальные окна */
+        .feedback-modal, .settings-modal, .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .feedback-modal.active, .settings-modal.active, .auth-modal.active {
+            display: flex;
+        }
+
+        .feedback-form, .settings-form, .auth-form {
+            background: rgba(16, 20, 60, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--secondary);
+            box-shadow: 0 0 30px rgba(0, 176, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            animation: modalAppear 0.5s ease;
+        }
+
+        @keyframes modalAppear {
+            0% { opacity: 0; transform: scale(0.8) translateY(-20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .feedback-form::before, .settings-form::before, .auth-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-light), var(--secondary), var(--accent));
+            animation: modalHeader 3s infinite;
+        }
+
+        @keyframes modalHeader {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .light-theme .feedback-form, .light-theme .settings-form, .light-theme .auth-form {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .blue-theme .feedback-form, .blue-theme .settings-form, .blue-theme .auth-form {
+            background: rgba(13, 71, 161, 0.95);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--secondary);
+            border-radius: 5px;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .light-theme .form-input, .light-theme .form-textarea, .light-theme .form-select {
+            background: rgba(0, 0, 0, 0.1);
+            color: #212121;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 176, 255, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .light-theme .btn-secondary {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Обновленные уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            z-index: 1001;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+            transform: translateX(100%);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.active {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--error);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+
+        /* Стили для авторизации */
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--secondary);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .auth-tab.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+
+        .auth-panel {
+            display: none;
+        }
+
+        .auth-panel.active {
+            display: block;
+        }
+
+        /* Новые элементы космической тематики */
+        .planet-decoration {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(1px);
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .pulsar {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            animation: pulsate 2s infinite;
+        }
+
+        @keyframes pulsate {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 968px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar-header .app-name, .user-info, .nav-text, .section-title span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+    <!-- Космический фон -->
+    <div class="space-background" id="spaceBackground"></div>
+
+    <div class="notification" id="notification"></div>
+
+    <!-- Модал обратной связи -->
+    <div class="feedback-modal" id="feedbackModal">
+        <div class="feedback-form">
+            <h2 class="form-title">
+                <i class="fas fa-comment-alt"></i>
+                <span id="feedbackTitle">Обратная связь</span>
+            </h2>
+            <div class="form-group">
+                <label class="form-label" for="feedbackName"><span id="feedbackNameLabel">Имя</span></label>
+                <input type="text" id="feedbackName" class="form-input" placeholder="Введите ваше имя">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="feedbackEmail"><span id="feedbackEmailLabel">Email</span></label>
+                <input type="email" id="feedbackEmail" class="form-input" placeholder="Введите ваш email">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="feedbackMessage"><span id="feedbackMessageLabel">Сообщение</span></label>
+                <textarea id="feedbackMessage" class="form-textarea" placeholder="Введите ваше сообщение"></textarea>
+            </div>
+            <div class="form-buttons">
+                <button class="btn btn-secondary" id="cancelFeedback"><span id="cancelFeedbackText">Отмена</span></button>
+                <button class="btn btn-primary" id="submitFeedback"><span id="submitFeedbackText">Отправить</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модал настроек -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-form">
+            <h2 class="form-title">
+                <i class="fas fa-cog"></i>
+                <span id="settingsTitle">Настройки</span>
+            </h2>
+            <div class="form-group">
+                <label class="form-label" for="languageSelect"><span id="languageLabel">Язык интерфейса</span></label>
+                <select id="languageSelect" class="form-select">
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="themeSelect"><span id="themeLabel">Тема оформления</span></label>
+                <select id="themeSelect" class="form-select">
+                    <option value="dark">Тёмная (по умолчанию)</option>
+                    <option value="light">Светлая</option>
+                    <option value="blue">Синяя</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button class="btn btn-secondary" id="cancelSettings"><span id="cancelSettingsText">Отмена</span></button>
+                <button class="btn btn-primary" id="saveSettings"><span id="saveSettingsText">Сохранить</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модал авторизации -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-form">
+            <h2 class="form-title">
+                <i class="fas fa-user-astronaut"></i>
+                <span id="authTitle">NASA ID</span>
+            </h2>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login"><span id="loginTabText">Вход</span></button>
+                <button class="auth-tab" data-tab="register"><span id="registerTabText">Регистрация</span></button>
+            </div>
+
+            <div class="auth-content">
+                <div class="auth-panel active" id="loginPanel">
+                    <div class="form-group">
+                        <label class="form-label" for="loginEmail"><span id="loginEmailLabel">Email</span></label>
+                        <input type="email" id="loginEmail" class="form-input" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword"><span id="loginPasswordLabel">Пароль</span></label>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••">
+                    </div>
+                    <div class="form-buttons">
+                        <button class="btn btn-secondary" id="cancelAuth"><span id="cancelAuthText">Отмена</span></button>
+                        <button class="btn btn-primary" id="submitLogin"><span id="submitLoginText">Войти</span></button>
+                    </div>
+                </div>
+
+                <div class="auth-panel" id="registerPanel">
+                    <div class="form-group">
+                        <label class="form-label" for="registerUsername"><span id="registerUsernameLabel">Имя пользователя</span></label>
+                        <input type="text" id="registerUsername" class="form-input" placeholder="Dr. Researcher">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="registerEmail"><span id="registerEmailLabel">Email</span></label>
+                        <input type="email" id="registerEmail" class="form-input" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="registerPassword"><span id="registerPasswordLabel">Пароль</span></label>
+                        <input type="password" id="registerPassword" class="form-input" placeholder="••••••••">
+                    </div>
+                    <div class="form-buttons">
+                        <button class="btn btn-secondary" id="cancelAuthReg"><span id="cancelAuthRegText">Отмена</span></button>
+                        <button class="btn btn-primary" id="submitRegister"><span id="submitRegisterText">Зарегистрироваться</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="nasa-logo">NASA</div>
+            <div class="app-name">EXOPLANETS AI</div>
+        </div>
+
+        <div class="user-section">
+            <div class="user-avatar">
+                <i class="fas fa-user-astronaut"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="userName">Dr. User</div>
+                <div class="user-status">
+                    <div class="status-dot"></div>
+                    <span id="userStatus">Online</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-item active" data-tab="analysis">
+                <div class="nav-icon"><i class="fas fa-search"></i></div>
+                <div class="nav-text"><span id="navAnalysis">Анализ экзопланет</span></div>
+            </div>
+            <div class="nav-item" data-tab="history">
+                <div class="nav-icon"><i class="fas fa-history"></i></div>
+                <div class="nav-text"><span id="navHistory">История запросов</span></div>
+            </div>
+            <div class="nav-item" data-tab="profile">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <div class="nav-text"><span id="navProfile">Профиль</span></div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <div class="section-title">
+                <i class="fas fa-history"></i>
+                <span id="historyTitle">ИСТОРИЯ ЗАПРОСОВ</span>
+            </div>
+            <div id="historyList"></div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="settings-btn" id="openSettings">
+                <i class="fas fa-cog"></i>
+                <span id="settingsBtnText">Settings</span>
+            </button>
+            <button class="settings-btn" id="openFeedback">
+                <i class="fas fa-comment-alt"></i>
+                <span id="feedbackBtnText">Feedback</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-header">
+            <h1 class="page-title" id="pageTitle">Анализ экзопланет на обитаемость</h1>
+            <button class="login-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span id="loginBtnText">NASA ID</span>
+            </button>
+        </div>
+
+        <div class="content-body">
+            <div class="form-container" id="analysisTab">
+                <h2 class="form-title">
+                    <i class="fas fa-globe-americas"></i>
+                    <span id="formTitle">ВВЕДИТЕ ХАРАКТЕРИСТИКИ ЭКЗОПЛАНЕТЫ:</span>
+                </h2>
+
+                <table class="characteristics-table">
+                    <tr><th id="orbitalPeriodLabel">ОРБИТАЛЬНЫЙ ПЕРИОД</th><td><input type="number" id="orbitalPeriod" class="input-field" step="0.1" min="0"><div class="input-hint" id="orbitalPeriodHint">В днях</div></td></tr>
+                    <tr><th id="transitEpochLabel">ЭПОХА ТРАНЗИТА</th><td><input type="number" id="transitEpoch" class="input-field" step="0.0001" min="0"><div class="input-hint" id="transitEpochHint">BKJD</div></td></tr>
+                    <tr><th id="impactParameterLabel">ПАРАМЕТР УДАРА</th><td><input type="number" id="impactParameter" class="input-field" step="0.01" min="0"><div class="input-hint" id="impactParameterHint">Безразмерная величина</div></td></tr>
+                    <tr><th id="transitDurationLabel">ПРОДОЛЖИТЕЛЬНОСТЬ ТРАНЗИТА</th><td><input type="number" id="transitDuration" class="input-field" step="0.1" min="0"><div class="input-hint" id="transitDurationHint">В часах</div></td></tr>
+                    <tr><th id="transitDepthLabel">ГЛУБИНА ТРАНЗИТА</th><td><input type="number" id="transitDepth" class="input-field" step="1" min="0"><div class="input-hint" id="transitDepthHint">В ppm</div></td></tr>
+                    <tr><th id="planetaryRadiusLabel">РАДИУС ПЛАНЕТЫ</th><td><input type="number" id="planetaryRadius" class="input-field" step="0.1" min="0"><div class="input-hint" id="planetaryRadiusHint">В земных радиусах</div></td></tr>
+                    <tr><th id="stellarRadiusLabel">РАДИУС ЗВЕЗДЫ</th><td><input type="number" id="stellarRadius" class="input-field" step="0.1" min="0"><div class="input-hint" id="stellarRadiusHint">В солнечных радиусах</div></td></tr>
+                    <tr><th id="equilibriumTemperatureLabel">ТЕМПЕРАТУРА РАВНОВЕСИЯ</th><td><input type="number" id="equilibriumTemperature" class="input-field" step="1" min="0"><div class="input-hint" id="equilibriumTemperatureHint">В Кельвинах</div></td></tr>
+                    <tr><th id="insolationFluxLabel">ПОТОК ИЗЛУЧЕНИЯ</th><td><input type="number" id="insolationFlux" class="input-field" step="0.1" min="0"><div class="input-hint" id="insolationFluxHint">В земных потоках</div></td></tr>
+                    <tr><th id="transitSNRLabel">СООТНОШЕНИЕ СИГНАЛ/ШУМ</th><td><input type="number" id="transitSNR" class="input-field" step="0.1" min="0"><div class="input-hint" id="transitSNRHint">Безразмерная величина</div></td></tr>
+                    <tr><th id="tcePlanetNumberLabel">НОМЕР ПЛАНЕТЫ TCE</th><td><input type="number" id="tcePlanetNumber" class="input-field" step="1" min="0"><div class="input-hint" id="tcePlanetNumberHint">Целое число</div></td></tr>
+                    <tr><th id="stellarTemperatureLabel">ТЕМПЕРАТУРА ЗВЕЗДЫ</th><td><input type="number" id="stellarTemperature" class="input-field" step="1" min="0"><div class="input-hint" id="stellarTemperatureHint">В Кельвинах</div></td></tr>
+                    <tr><th id="stellarSurfaceGravityLabel">ГРАВИТАЦИЯ ЗВЕЗДЫ</th><td><input type="number" id="stellarSurfaceGravity" class="input-field" step="0.01" min="0"><div class="input-hint" id="stellarSurfaceGravityHint">log10(cm/s²)</div></td></tr>
+                    <tr><th id="raLabel">ПРЯМОЕ ВОСХОЖДЕНИЕ</th><td><input type="number" id="ra" class="input-field" step="0.0001" min="0"><div class="input-hint" id="raHint">В градусах</div></td></tr>
+                    <tr><th id="decLabel">СКЛОНЕНИЕ</th><td><input type="number" id="dec" class="input-field" step="0.0001" min="-90" max="90"><div class="input-hint" id="decHint">В градусах</div></td></tr>
+                    <tr><th id="keplerBandLabel">ЗВЕЗДНАЯ ВЕЛИЧИНА</th><td><input type="number" id="keplerBand" class="input-field" step="0.01" min="0"><div class="input-hint" id="keplerBandHint">В системе Kepler-band</div></td></tr>
+                    <tr><th id="starSystemLabel">ЗВЕЗДНАЯ СИСТЕМА</th><td><input type="text" id="starSystem" class="input-field" placeholder="Например: Kepler-186"><div class="input-hint" id="starSystemHint">Название системы</div></td></tr>
+                </table>
+
+                <button class="submit-btn" id="analyzeBtn">
+                    <span id="analyzeBtnText">Анализировать экзопланету</span>
+                </button>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <div class="result-header">
+                    <h2 class="result-title" id="resultTitle">Результаты анализа</h2>
+                    <div class="habitability-badge" id="habitabilityBadge">Обитаема</div>
+                </div>
+                <div class="confidence-display">
+                    <div class="confidence-value" id="confidenceValue">0%</div>
+                    <div class="confidence-bar-large">
+                        <div class="confidence-fill-large" id="confidenceFill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="analysis-text" id="analysisText"></div>
+                <h3 id="detailsTitle">Детали анализа:</h3>
+                <div class="details-grid" id="detailsGrid"></div>
+                <div class="pdf-section" style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                    <button class="btn btn-primary" id="generatePdfBtn" style="padding: 12px 25px; font-size: 1.1rem;">
+                        <i class="fas fa-file-pdf"></i>
+                        <span id="generatePdfText">Download PDF-report</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-container" id="historyTab" style="display: none;">
+                <h2 class="form-title">
+                    <i class="fas fa-history"></i>
+                    <span id="historyTabTitle">ИСТОРИЯ ЗАПРОСОВ</span>
+                </h2>
+                <div id="fullHistoryList"></div>
+            </div>
+
+            <div class="form-container" id="profileTab" style="display: none;">
+                <h2 class="form-title">
+                    <i class="fas fa-user"></i>
+                    <span id="profileTabTitle">ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ</span>
+                </h2>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label" id="profileUsernameLabel">Имя пользователя</div>
+                        <div class="detail-value" id="profileUsername">Dr. User</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label" id="profileSearchesLabel">Количество анализов</div>
+                        <div class="detail-value" id="profileSearches">0</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label" id="profileMemberLabel">Участник с</div>
+                        <div class="detail-value" id="profileMemberSince">2024-01-15</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let currentSettings = { language: 'ru', theme: 'dark' };
+        let currentSession = {
+            token: localStorage.getItem('sessionToken'),
+            user: null
+        };
+
+        const translations = {
+            ru: {
+                pageTitle: "Анализ экзопланет",
+                formTitle: "ВВЕДИТЕ ХАРАКТЕРИСТИКИ ЭКЗОПЛАНЕТЫ:",
+                analyzeBtn: "Анализировать экзопланету",
+                navAnalysis: "Анализ экзопланет",
+                navHistory: "История запросов",
+                navProfile: "Профиль",
+                historyTitle: "ИСТОРИЯ ЗАПРОСОВ",
+                settingsBtn: "Настройки",
+                feedbackBtn: "Обратная связь",
+                loginBtn: "NASA ID",
+                settingsTitle: "Настройки",
+                languageLabel: "Язык интерфейса",
+                themeLabel: "Тема оформления",
+                cancelSettings: "Отмена",
+                saveSettings: "Сохранить",
+                feedbackTitle: "Обратная связь",
+                feedbackNameLabel: "Имя",
+                feedbackEmailLabel: "Email",
+                feedbackMessageLabel: "Сообщение",
+                cancelFeedback: "Отмена",
+                submitFeedback: "Отправить",
+                resultTitle: "Результаты анализа",
+                detailsTitle: "Детали анализа:",
+                historyTabTitle: "ИСТОРИЯ ЗАПРОСОВ",
+                profileTabTitle: "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ",
+                profileUsernameLabel: "Имя пользователя",
+                profileSearchesLabel: "Количество анализов",
+                profileMemberLabel: "Участник с",
+                userStatus: "Online",
+                orbitalPeriodLabel: "ОРБИТАЛЬНЫЙ ПЕРИОД",
+                transitEpochLabel: "ЭПОХА ТРАНЗИТА",
+                impactParameterLabel: "ПАРАМЕТр УДАРА",
+                transitDurationLabel: "ПРОДОЛЖИТЕЛЬНОСТЬ ТРАНЗИТА",
+                transitDepthLabel: "ГЛУБИНА ТРАНЗИТА",
+                planetaryRadiusLabel: "РАДИУС ПЛАНЕТЫ",
+                stellarRadiusLabel: "РАДИУС ЗВЕЗДЫ",
+                equilibriumTemperatureLabel: "ТЕМПЕРАТУРА РАВНОВЕСИЯ",
+                insolationFluxLabel: "ПОТОК ИЗЛУЧЕНИЯ",
+                transitSNRLabel: "СООТНОШЕНИЕ СИГНАЛ/ШУМ",
+                tcePlanetNumberLabel: "НОМЕР ПЛАНЕТЫ TCE",
+                stellarTemperatureLabel: "ТЕМПЕРАТУРА ЗВЕЗДЫ",
+                stellarSurfaceGravityLabel: "ГРАВИТАЦИЯ ЗВЕЗДЫ",
+                raLabel: "ПРЯМОЕ ВОСХОЖДЕНИЕ",
+                decLabel: "СКЛОНЕНИЕ",
+                keplerBandLabel: "ЗВЕЗДНАЯ ВЕЛИЧИНА",
+                starSystemLabel: "ЗВЕЗДНАЯ СИСТЕМА",
+                orbitalPeriodHint: "В днях",
+                transitEpochHint: "BKJD",
+                impactParameterHint: "Безразмерная величина",
+                transitDurationHint: "В часах",
+                transitDepthHint: "В ppm",
+                planetaryRadiusHint: "В земных радиусах",
+                stellarRadiusHint: "В солнечных радиусах",
+                equilibriumTemperatureHint: "В Кельвинах",
+                insolationFluxHint: "В земных потоках",
+                transitSNRHint: "Безразмерная величина",
+                tcePlanetNumberHint: "Целое число",
+                stellarTemperatureHint: "В Кельвинах",
+                stellarSurfaceGravityHint: "log10(cm/s²)",
+                raHint: "В градусах",
+                decHint: "В градусах",
+                keplerBandHint: "В системе Kepler-band",
+                starSystemHint: "Название системы",
+                authTitle: "NASA ID",
+                loginTabText: "Вход",
+                registerTabText: "Регистрация",
+                loginEmailLabel: "Email",
+                loginPasswordLabel: "Пароль",
+                cancelAuthText: "Отмена",
+                submitLoginText: "Войти",
+                registerUsernameLabel: "Имя пользователя",
+                registerEmailLabel: "Email",
+                registerPasswordLabel: "Пароль",
+                cancelAuthRegText: "Отмена",
+                submitRegisterText: "Зарегистрироваться",
+                logoutText: "Выйти",
+                welcomeText: "Добро пожаловать"
+            },
+            en: {
+                pageTitle: "Exoplanet Analysis",
+                formTitle: "ENTER EXOPLANET CHARACTERISTICS:",
+                analyzeBtn: "Analyze Exoplanet",
+                navAnalysis: "Exoplanet Analysis",
+                navHistory: "Search History",
+                navProfile: "Profile",
+                historyTitle: "SEARCH HISTORY",
+                settingsBtn: "Settings",
+                feedbackBtn: "Feedback",
+                loginBtn: "NASA ID",
+                settingsTitle: "Settings",
+                languageLabel: "Interface Language",
+                themeLabel: "Theme",
+                cancelSettings: "Cancel",
+                saveSettings: "Save",
+                feedbackTitle: "Feedback",
+                feedbackNameLabel: "Name",
+                feedbackEmailLabel: "Email",
+                feedbackMessageLabel: "Message",
+                cancelFeedback: "Cancel",
+                submitFeedback: "Submit",
+                resultTitle: "Analysis Results",
+                detailsTitle: "Analysis Details:",
+                historyTabTitle: "SEARCH HISTORY",
+                profileTabTitle: "USER PROFILE",
+                profileUsernameLabel: "Username",
+                profileSearchesLabel: "Analysis Count",
+                profileMemberLabel: "Member since",
+                userStatus: "Online",
+                orbitalPeriodLabel: "ORBITAL PERIOD",
+                transitEpochLabel: "TRANSIT EPOCH",
+                impactParameterLabel: "IMPACT PARAMETER",
+                transitDurationLabel: "TRANSIT DURATION",
+                transitDepthLabel: "TRANSIT DEPTH",
+                planetaryRadiusLabel: "PLANETARY RADIUS",
+                stellarRadiusLabel: "STELLAR RADIUS",
+                equilibriumTemperatureLabel: "EQUILIBRIUM TEMPERATURE",
+                insolationFluxLabel: "INSOLATION FLUX",
+                transitSNRLabel: "TRANSIT SIGNAL-TO-NOISE",
+                tcePlanetNumberLabel: "TCE PLANET NUMBER",
+                stellarTemperatureLabel: "STELLAR TEMPERATURE",
+                stellarSurfaceGravityLabel: "STELLAR SURFACE GRAVITY",
+                raLabel: "RIGHT ASCENSION",
+                decLabel: "DECLINATION",
+                keplerBandLabel: "KEPLER-BAND MAGNITUDE",
+                starSystemLabel: "STAR SYSTEM",
+                orbitalPeriodHint: "In days",
+                transitEpochHint: "BKJD",
+                impactParameterHint: "Dimensionless",
+                transitDurationHint: "In hours",
+                transitDepthHint: "In ppm",
+                planetaryRadiusHint: "In Earth radii",
+                stellarRadiusHint: "In solar radii",
+                equilibriumTemperatureHint: "In Kelvin",
+                insolationFluxHint: "In Earth fluxes",
+                transitSNRHint: "Dimensionless",
+                tcePlanetNumberHint: "Integer",
+                stellarTemperatureHint: "In Kelvin",
+                stellarSurfaceGravityHint: "log10(cm/s²)",
+                raHint: "In degrees",
+                decHint: "In degrees",
+                keplerBandHint: "In Kepler-band system",
+                starSystemHint: "System name",
+                authTitle: "NASA ID",
+                loginTabText: "Login",
+                registerTabText: "Register",
+                loginEmailLabel: "Email",
+                loginPasswordLabel: "Password",
+                cancelAuthText: "Cancel",
+                submitLoginText: "Login",
+                registerUsernameLabel: "Username",
+                registerEmailLabel: "Email",
+                registerPasswordLabel: "Password",
+                cancelAuthRegText: "Cancel",
+                submitRegisterText: "Register",
+                logoutText: "Logout",
+                welcomeText: "Welcome"
+            }
+        };
+
+        // Функция для создания космического фона
+        function createSpaceBackground() {
+            const spaceBg = document.getElementById('spaceBackground');
+
+            // Создаем звезды
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 3}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.opacity = Math.random() * 0.8 + 0.2;
+                star.style.setProperty('--duration', `${Math.random() * 10 + 5}s`);
+                spaceBg.appendChild(star);
+            }
+
+            // Создаем туманности
+            for (let i = 0; i < 5; i++) {
+                const nebula = document.createElement('div');
+                nebula.className = 'nebula';
+                nebula.style.width = `${Math.random() * 300 + 100}px`;
+                nebula.style.height = nebula.style.width;
+                nebula.style.left = `${Math.random() * 100}%`;
+                nebula.style.top = `${Math.random() * 100}%`;
+                nebula.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                nebula.style.animationDuration = `${Math.random() * 40 + 20}s`;
+                spaceBg.appendChild(nebula);
+            }
+
+            // Создаем плавающие элементы
+            for (let i = 0; i < 10; i++) {
+                const element = document.createElement('div');
+                element.className = 'floating-element';
+                element.style.width = `${Math.random() * 20 + 10}px`;
+                element.style.height = element.style.width;
+                element.style.left = `${Math.random() * 100}%`;
+                element.style.top = `${Math.random() * 100}%`;
+                element.style.backgroundColor = `hsla(${Math.random() * 360}, 70%, 60%, 0.3)`;
+                element.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+                element.style.animationDuration = `${Math.random() * 10 + 5}s`;
+                element.style.animationDelay = `${Math.random() * 5}s`;
+                spaceBg.appendChild(element);
+            }
+
+            // Создаем пульсары
+            for (let i = 0; i < 8; i++) {
+                const pulsar = document.createElement('div');
+                pulsar.className = 'pulsar';
+                pulsar.style.left = `${Math.random() * 100}%`;
+                pulsar.style.top = `${Math.random() * 100}%`;
+                pulsar.style.animationDelay = `${Math.random() * 2}s`;
+                spaceBg.appendChild(pulsar);
+            }
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('exoplanetSettings');
+            if (saved) currentSettings = JSON.parse(saved);
+            applySettings();
+        }
+
+        function applySettings() {
+            document.body.className = currentSettings.theme + '-theme';
+            applyLanguage(currentSettings.language);
+            document.getElementById('languageSelect').value = currentSettings.language;
+            document.getElementById('themeSelect').value = currentSettings.theme;
+        }
+
+        function applyLanguage(lang) {
+            const texts = translations[lang];
+            Object.keys(texts).forEach(key => {
+                const elements = document.querySelectorAll(`[id="${key}"]`);
+                elements.forEach(el => {
+                    if (el.tagName === 'INPUT' && el.placeholder) {
+                        el.placeholder = texts[key];
+                    } else {
+                        el.textContent = texts[key];
+                    }
+                });
+            });
+
+            const starSystemInput = document.getElementById('starSystem');
+            if (starSystemInput) {
+                starSystemInput.placeholder = lang === 'ru' ? 'Например: Kepler-186' : 'For example: Kepler-186';
+            }
+        }
+
+        async function saveSettings() {
+            const language = document.getElementById('languageSelect').value;
+            const theme = document.getElementById('themeSelect').value;
+            currentSettings = { language, theme };
+            localStorage.setItem('exoplanetSettings', JSON.stringify(currentSettings));
+
+            try {
+                await fetch(`${API_BASE}/settings`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(currentSettings)
+                });
+            } catch (error) {
+                console.log('Settings saved locally');
+            }
+
+            applySettings();
+            document.getElementById('settingsModal').classList.remove('active');
+            showNotification(currentSettings.language === 'ru' ? 'Настройки сохранены!' : 'Settings saved!', 'success');
+
+            applyLanguage(currentSettings.language);
+
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            analyzeBtn.innerHTML = '<span id="analyzeBtnText">' +
+                (currentSettings.language === 'ru' ? 'Анализировать экзопланету' : 'Analyze Exoplanet') + '</span>';
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} active`;
+            setTimeout(() => notification.classList.remove('active'), 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            createSpaceBackground();
+            loadSettings();
+            setupEventListeners();
+
+            // Проверяем существующую сессию
+            if (currentSession.token) {
+                validateSession();
+            } else {
+                loadUserProfile();
+                loadHistory();
+            }
+
+            applyLanguage(currentSettings.language);
+        });
+
+        function setupEventListeners() {
+            document.getElementById('openSettings').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.add('active');
+            });
+            document.getElementById('openFeedback').addEventListener('click', () => {
+                document.getElementById('feedbackModal').classList.add('active');
+            });
+            document.getElementById('cancelSettings').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.remove('active');
+            });
+            document.getElementById('cancelFeedback').addEventListener('click', () => {
+                document.getElementById('feedbackModal').classList.remove('active');
+            });
+            document.getElementById('saveSettings').addEventListener('click', saveSettings);
+            document.getElementById('submitFeedback').addEventListener('click', submitFeedback);
+            document.getElementById('analyzeBtn').addEventListener('click', analyzeExoplanet);
+
+            // Авторизация
+            document.querySelector('.login-btn').addEventListener('click', () => {
+                if (currentSession.token) {
+                    showUserMenu();
+                } else {
+                    showAuthModal();
+                }
+            });
+
+            document.getElementById('cancelAuth').addEventListener('click', hideAuthModal);
+            document.getElementById('cancelAuthReg').addEventListener('click', hideAuthModal);
+            document.getElementById('submitLogin').addEventListener('click', loginUser);
+            document.getElementById('submitRegister').addEventListener('click', registerUser);
+
+            // Табы авторизации
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchAuthTab(tabName);
+                });
+            });
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab') + 'Tab';
+                    document.querySelectorAll('.form-container').forEach(tab => tab.style.display = 'none');
+                    document.getElementById(tabId).style.display = 'block';
+                });
+            });
+        }
+
+        // Функции авторизации
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+            switchAuthTab('login');
+        }
+
+        function hideAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            // Очистка полей
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('registerUsername').value = '';
+            document.getElementById('registerEmail').value = '';
+            document.getElementById('registerPassword').value = '';
+        }
+
+        function switchAuthTab(tabName) {
+            document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.auth-panel').forEach(panel => panel.classList.remove('active'));
+
+            document.querySelector(`.auth-tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}Panel`).classList.add('active');
+        }
+
+        async function loginUser() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showNotification(currentSettings.language === 'ru' ? 'Заполните все поля!' : 'Please fill all fields!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!response.ok) throw new Error('Login failed');
+
+                const result = await response.json();
+
+                currentSession.token = result.session_token;
+                currentSession.user = {
+                    id: result.user_id,
+                    username: result.username
+                };
+
+                localStorage.setItem('sessionToken', currentSession.token);
+                hideAuthModal();
+
+                updateUIForLoggedInUser();
+                showNotification(
+                    currentSettings.language === 'ru' ?
+                    `Добро пожаловать, ${result.username}!` :
+                    `Welcome, ${result.username}!`,
+                    'success'
+                );
+
+                await loadUserProfile();
+                await loadHistory();
+
+            } catch (error) {
+                showNotification(
+                    currentSettings.language === 'ru' ?
+                    'Ошибка входа! Проверьте email и пароль.' :
+                    'Login error! Check email and password.',
+                    'error'
+                );
+            }
+        }
+
+        async function registerUser() {
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            if (!username || !email || !password) {
+                showNotification(currentSettings.language === 'ru' ? 'Заполните все поля!' : 'Please fill all fields!', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showNotification(currentSettings.language === 'ru' ? 'Пароль должен быть не менее 6 символов!' : 'Password must be at least 6 characters!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                if (!response.ok) throw new Error('Registration failed');
+
+                const result = await response.json();
+
+                currentSession.token = result.session_token;
+                currentSession.user = {
+                    id: result.user_id,
+                    username: result.username
+                };
+
+                localStorage.setItem('sessionToken', currentSession.token);
+                hideAuthModal();
+
+                updateUIForLoggedInUser();
+                showNotification(
+                    currentSettings.language === 'ru' ?
+                    'Регистрация успешна! Добро пожаловать!' :
+                    'Registration successful! Welcome!',
+                    'success'
+                );
+
+                await loadUserProfile();
+                await loadHistory();
+
+            } catch (error) {
+                showNotification(
+                    currentSettings.language === 'ru' ?
+                    'Ошибка регистрации! Email уже занят.' :
+                    'Registration error! Email already exists.',
+                    'error'
+                );
+            }
+        }
+
+        function updateUIForLoggedInUser() {
+            const loginBtn = document.querySelector('.login-btn');
+            if (currentSession.user) {
+                loginBtn.innerHTML = `
+                    <i class="fas fa-user-astronaut"></i>
+                    <span>${currentSession.user.username}</span>
+                `;
+            }
+        }
+
+        function showUserMenu() {
+            if (confirm(currentSettings.language === 'ru' ? 'Вы хотите выйти?' : 'Do you want to logout?')) {
+                logoutUser();
+            }
+        }
+
+        async function logoutUser() {
+            if (currentSession.token) {
+                try {
+                    await fetch(`${API_BASE}/api/logout`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ session_token: currentSession.token })
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+
+            currentSession.token = null;
+            currentSession.user = null;
+            localStorage.removeItem('sessionToken');
+
+            // Обновляем UI
+            const loginBtn = document.querySelector('.login-btn');
+            loginBtn.innerHTML = `
+                <i class="fas fa-sign-in-alt"></i>
+                <span id="loginBtnText">NASA ID</span>
+            `;
+
+            showNotification(
+                currentSettings.language === 'ru' ?
+                'Вы вышли из системы' :
+                'You have been logged out',
+                'success'
+            );
+
+            // Перезагружаем профиль и историю
+            await loadUserProfile();
+            await loadHistory();
+        }
+
+        async function validateSession() {
+            try {
+                await loadUserProfile();
+                updateUIForLoggedInUser();
+            } catch (error) {
+                // Сессия невалидна
+                currentSession.token = null;
+                currentSession.user = null;
+                localStorage.removeItem('sessionToken');
+                await loadUserProfile();
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const headers = {};
+                if (currentSession.token) {
+                    headers['Authorization'] = `Bearer ${currentSession.token}`;
+                }
+
+                const response = await fetch(`${API_BASE}/me`, { headers });
+                const profile = await response.json();
+
+                document.getElementById('userName').textContent = profile.username;
+                document.getElementById('profileUsername').textContent = profile.username;
+                document.getElementById('profileSearches').textContent = profile.searches_count;
+                document.getElementById('profileMemberSince').textContent = profile.member_since;
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/history`);
+                const data = await response.json();
+                const historyList = document.getElementById('historyList');
+                const fullHistoryList = document.getElementById('fullHistoryList');
+
+                historyList.innerHTML = '';
+                fullHistoryList.innerHTML = '';
+
+                data.searches.slice(-5).reverse().forEach(search => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div class="history-planet-name">${search.parameters.star_system}</div>
+                        <div class="history-confidence">
+                            <span>${search.result.confidence.toFixed(1)}%</span>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${search.result.confidence}%"></div>
+                            </div>
+                        </div>
+                    `;
+                    historyList.appendChild(item.cloneNode(true));
+                    fullHistoryList.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        async function analyzeExoplanet() {
+            const formData = {
+                orbital_period: parseFloat(document.getElementById('orbitalPeriod').value) || 0,
+                transit_epoch: parseFloat(document.getElementById('transitEpoch').value) || 0,
+                impact_parameter: parseFloat(document.getElementById('impactParameter').value) || 0,
+                transit_duration: parseFloat(document.getElementById('transitDuration').value) || 0,
+                transit_depth: parseFloat(document.getElementById('transitDepth').value) || 0,
+                planetary_radius: parseFloat(document.getElementById('planetaryRadius').value) || 0,
+                stellar_radius: parseFloat(document.getElementById('stellarRadius').value) || 0,
+                equilibrium_temperature: parseFloat(document.getElementById('equilibriumTemperature').value) || 0,
+                insolation_flux: parseFloat(document.getElementById('insolationFlux').value) || 0,
+                transit_snr: parseFloat(document.getElementById('transitSNR').value) || 0,
+                tce_planet_number: parseInt(document.getElementById('tcePlanetNumber').value) || 0,
+                stellar_temperature: parseFloat(document.getElementById('stellarTemperature').value) || 0,
+                stellar_surface_gravity: parseFloat(document.getElementById('stellarSurfaceGravity').value) || 0,
+                ra: parseFloat(document.getElementById('ra').value) || 0,
+                dec: parseFloat(document.getElementById('dec').value) || 0,
+                kepler_band: parseFloat(document.getElementById('keplerBand').value) || 0,
+                star_system: document.getElementById('starSystem').value || "Unknown System"
+            };
+
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' +
+                (currentSettings.language === 'ru' ? 'Анализ...' : 'Analyzing...');
+
+            try {
+                const headers = {'Content-Type': 'application/json'};
+                if (currentSession.token) {
+                    headers['Authorization'] = `Bearer ${currentSession.token}`;
+                }
+
+                const response = await fetch(`${API_BASE}/search`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(formData)
+                });
+                const result = await response.json();
+
+                document.getElementById('confidenceValue').textContent = result.confidence.toFixed(1) + '%';
+                document.getElementById('confidenceFill').style.width = result.confidence + '%';
+                document.getElementById('analysisText').textContent = result.analysis;
+
+                const badge = document.getElementById('habitabilityBadge');
+                badge.textContent = result.habitable ?
+                    (currentSettings.language === 'ru' ? 'Успех!' : 'Success!') :
+                    (currentSettings.language === 'ru' ? 'Провал!' : 'Fail!');
+                badge.className = `habitability-badge ${result.habitable ? 'habitable' : 'not-habitable'}`;
+
+                document.getElementById('detailsGrid').innerHTML = `
+                    <div class="detail-item"><div class="detail-label">${currentSettings.language === 'ru' ? 'Орбитальный период' : 'Orbital Period'}</div><div class="detail-value">${formData.orbital_period} ${currentSettings.language === 'ru' ? 'дней' : 'days'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentSettings.language === 'ru' ? 'Радиус планеты' : 'Planetary Radius'}</div><div class="detail-value">${formData.planetary_radius} R⊕</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentSettings.language === 'ru' ? 'Радиус звезды' : 'Stellar Radius'}</div><div class="detail-value">${formData.stellar_radius} R☉</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentSettings.language === 'ru' ? 'Температура равновесия' : 'Equilibrium Temperature'}</div><div class="detail-value">${formData.equilibrium_temperature} K</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentSettings.language === 'ru' ? 'Поток излучения' : 'Insolation Flux'}</div><div class="detail-value">${formData.insolation_flux} F⊕</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentSettings.language === 'ru' ? 'Звездная система' : 'Star System'}</div><div class="detail-value">${formData.star_system}</div></div>
+                `;
+
+                document.getElementById('resultsContainer').classList.add('active');
+                showNotification(currentSettings.language === 'ru' ? 'Анализ завершен!' : 'Analysis complete!', 'success');
+                await loadHistory();
+                await loadUserProfile();
+
+                // Сохраняем search_id для генерации PDF
+                window.currentSearchId = result.search_id;
+
+                // Настраиваем кнопку генерации PDF
+                setupPdfButton();
+
+                await loadHistory();
+                await loadUserProfile();
+
+
+                // Функция настройки кнопки PDF
+                function setupPdfButton() {
+                    const generateBtn = document.getElementById('generatePdfBtn');
+                    if (generateBtn) {
+                        generateBtn.replaceWith(generateBtn.cloneNode(true));
+                        // Добавляем новый обработчик
+                        document.getElementById('generatePdfBtn').addEventListener('click', generatePdfReport);
+                    }
+                }
+
+                // Функция генерации PDF
+                async function generatePdfReport() {
+                    if (!window.currentSearchId) {
+                        showNotification(currentSettings.language === 'ru' ? 'Нет данных для отчета!' : 'No data for report!', 'error');
+                        return;
+                    }
+
+                    const generateBtn = document.getElementById('generatePdfBtn');
+                    const originalText = generateBtn.innerHTML;
+
+                    generateBtn.disabled = true;
+                    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' +
+                        (currentSettings.language === 'ru' ? 'Генерация PDF...' : 'Generating PDF...');
+
+                    try {
+                        const response = await fetch(`${API_BASE}/api/generate-pdf`, {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                search_id: window.currentSearchId,
+                                language: currentSettings.language
+                            })
+                        });
+
+                        if (response.ok) {
+                            const blob = await response.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.style.display = 'none';
+                            a.href = url;
+                            a.download = `exoplanet_report_${window.currentSearchId}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+
+                            showNotification(
+                                currentSettings.language === 'ru' ?
+                                'PDF отчет успешно скачан!' :
+                                'PDF report downloaded successfully!',
+                                'success'
+                            );
+                        } else {
+                            throw new Error('PDF generation failed');
+                        }
+                    } catch (error) {
+                        console.error('PDF generation error:', error);
+                        showNotification(
+                            currentSettings.language === 'ru' ?
+                            'Ошибка генерации PDF!' :
+                            'PDF generation error!',
+                            'error'
+                        );
+                    } finally {
+                        generateBtn.disabled = false;
+                        generateBtn.innerHTML = originalText;
+                        // Обновляем текст кнопки после восстановления
+                        const pdfText = document.getElementById('generatePdfText');
+                        if (pdfText) {
+                            pdfText.textContent = currentSettings.language === 'ru' ? 'Скачать PDF отчет' : 'Download PDF Report';
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Analysis error:', error);
+                showNotification(currentSettings.language === 'ru' ? 'Ошибка анализа!' : 'Analysis error!', 'error');
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<span id="analyzeBtnText">' +
+                    (currentSettings.language === 'ru' ? 'Анализировать экзопланету' : 'Analyze Exoplanet') + '</span>';
+                applyLanguage(currentSettings.language);
+            }
+        }
+
+        async function submitFeedback() {
+            const feedbackData = {
+                name: document.getElementById('feedbackName').value,
+                email: document.getElementById('feedbackEmail').value,
+                message: document.getElementById('feedbackMessage').value
+            };
+
+            if (!feedbackData.name || !feedbackData.email || !feedbackData.message) {
+                showNotification(currentSettings.language === 'ru' ? 'Заполните все поля!' : 'Please fill all fields!', 'error');
+                return;
+            }
+
+            try {
+                await fetch(`${API_BASE}/help`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(feedbackData)
+                });
+
+                document.getElementById('feedbackModal').classList.remove('active');
+                document.getElementById('feedbackName').value = '';
+                document.getElementById('feedbackEmail').value = '';
+                document.getElementById('feedbackMessage').value = '';
+                showNotification(currentSettings.language === 'ru' ? 'Отзыв отправлен!' : 'Feedback sent!', 'success');
+            } catch (error) {
+                showNotification(currentSettings.language === 'ru' ? 'Ошибка отправки!' : 'Send error!', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
