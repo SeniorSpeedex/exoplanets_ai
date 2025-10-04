@@ -92,7 +92,7 @@ docker-compose up --build
 
 *3. After completing all steps, the application will be available at - http://127.0.0.1:8000*
 
-- **Cloud:**  
+- ## **Cloud:**   
   ## Server Setup with Docker
 
 ### Prerequisites
