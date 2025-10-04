@@ -4,6 +4,11 @@
 
 ---
 
+## Project demo website
+http://84.54.29.144:8000/ - all functions are working here! Try and send your feedback to us!
+
+---
+
 ## Requirements
 
 - **Python 3.8+**
